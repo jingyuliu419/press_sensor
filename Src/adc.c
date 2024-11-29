@@ -26,15 +26,50 @@
 	#include "usart.h"
 	#include "stdint.h"
 
+#ifndef MIN
+#define MIN(a, b) ((b)>(a)?(a):(b))
+#endif
+
 uint16_t all_point_value[256]={0};
 uint16_t ADC_scan_finished=FALSE;
 uint16_t adcValue[16]={0};
-uint16_t count=0;//²ÉÑùÐòÁÐ¼ÆÊý
+uint16_t count=0;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¼ï¿½ï¿½ï¿½
 
 /* USER CODE END 0 */
 
 ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
+
+void hexdump(const void *ptr, size_t len, uintptr_t disp_addr) {
+    uintptr_t address = (uintptr_t)ptr;
+    size_t count;
+    size_t i;
+    const char *addr_fmt = ((disp_addr + len) > 0xFFFFFFFF)
+                           ? "0x%016llx: "
+                           : "0x%08llx: ";
+
+    for (count = 0 ; count < len; count += 16) {
+        printf(addr_fmt, disp_addr + count);
+
+        for (i=0; i < MIN(len - count, 16); i++) {
+            printf("%02hhx ", *(const uint8_t *)(address + i));
+        }
+
+        for (; i < 16; i++) {
+            printf("   ");
+        }
+
+        printf("|");
+
+        for (i=0; i < MIN(len - count, 16); i++) {
+            char c = ((const char *)address)[i];
+            printf("%c", isprint(c) ? c : '.');
+        }
+
+        printf("\r\n");
+        address += 16;
+    }
+}
 
 /* ADC1 init function */
 void MX_ADC1_Init(void)
@@ -316,9 +351,9 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 uint16_t ADC_Read(uint32_t Channel)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
-	sConfig.Channel = Channel;                                         /* Í¨µÀ */
+	sConfig.Channel = Channel;                                         /* Í¨ï¿½ï¿½ */
 	sConfig.Rank = ADC_REGULAR_RANK_1;                              
-	sConfig.SamplingTime = ADC_SAMPLETIME_55CYCLES_5;                  /* ²ÉÑùÊ±¼ä */
+	sConfig.SamplingTime = ADC_SAMPLETIME_55CYCLES_5;                  /* ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ */
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)             
 	{
 		Error_Handler();
@@ -341,7 +376,7 @@ void delay_us(uint32_t us)
 
 
 
-/**256¸öÍ¨µÀ²ÉÑùÍê³Éºó£¬Êý¾ÝÐ´ÈëÊý×éall_point_valueÖÐ£¬½«ADC_scan_finishedÖÃÎª1
+/**256ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Éºï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½all_point_valueï¿½Ð£ï¿½ï¿½ï¿½ADC_scan_finishedï¿½ï¿½Îª1
 */
 uint16_t afterorder[16];
 uint16_t t1;
@@ -351,8 +386,8 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 	static int round=0;
 	if(round ==0)
 		t1= HAL_GetTick();
-		//°´ÕÕÁÐÐòÁÐÖØÐÂÅÅÁÐ
-		setCD4076Channel(round+1);
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		// setCD4076Channel(round+1);
 		afterorder[15-1]=adcValue[0];
 		afterorder[13-1]=adcValue[1];
 		afterorder[11-1]=adcValue[2];
@@ -370,7 +405,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 		afterorder[14-1]=adcValue[14];
 		afterorder[16-1]=adcValue[15]; 
 //		
-//		//ÄæÐò£¬ºÍ´«¸ÐÆ÷´ÓÉÏµ½ÏÂË³ÐòÒ»ÖÂ
+//		//ï¿½ï¿½ï¿½ò£¬ºÍ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½Ë³ï¿½ï¿½Ò»ï¿½ï¿½
 		uint16_t temp;
 		for(int i=0; i<8;++i)
 		{
@@ -379,7 +414,10 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 			afterorder[15-i]=temp;
 		}
 		
-		//ÕûÀíÌí¼Óµ½256µÄÍêÕûÖ¡Êý×éÖÐ
+
+    // printf("sizeof(afterorder)%d\r\n", sizeof(afterorder));
+    // hexdump(afterorder, sizeof(afterorder), (uintptr_t)afterorder);
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½256ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		for(int i=0;i<16;i++)
 		{
 			all_point_value[round*16+i]=afterorder[i];
@@ -387,9 +425,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 		round++;
 		if(round == 16)
 		{
-					//Êý¾Ý²ÉÑùÒÑÍê±Ï£¬¿ÉÒÔ·¢ËÍÁË¡£
+					//ï¿½ï¿½ï¿½Ý²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï£ï¿½ï¿½ï¿½ï¿½Ô·ï¿½ï¿½ï¿½ï¿½Ë¡ï¿½
 		uint16_t tic= HAL_GetTick();
-		//printf("adopt 16 times,tick:%d\n",tic-t1);
+		// printf("adopt 16 times,tick:%d\n",tic-t1);
 			ADC_scan_finished =1;
 			round = 0;
 			return;
@@ -399,7 +437,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 			
 		//HAL_Delay(1);
 			delay_us(500);
-			HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue,16);//ÔÚÒ»¸öÉ¨ÃèÑ­»·ÖÐ£¬¿ªÆô£¬Ò»¸öÑ­»·½áÊø£¬¾Í²»ÔÙµ÷ÓÃ
+			HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue,16);//ï¿½ï¿½Ò»ï¿½ï¿½É¨ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í²ï¿½ï¿½Ùµï¿½ï¿½ï¿½
 		}
 }
 
@@ -416,12 +454,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		//printf("enter in time callback,tick:%d\n",t1);
 		ADC_scan_finished=0;
 
-			for(int i=0;i<256;++i)//ÐÐ
+			for(int i=0;i<256;++i)//ï¿½ï¿½
 			{
 				preparedData[2*i]=all_point_value[i]>>8;
 				preparedData[2*i+1]=all_point_value[i]&0xff;
 			}
-//			for(int i=0;i<256;++i)//ÐÐ
+//			for(int i=0;i<256;++i)//ï¿½ï¿½
 //			{
 //				printf("%d ",all_point_value[i]);
 //				if((i+1)%16 == 0)
@@ -450,8 +488,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //				tickslastlast=	HAL_GetTick();
 //			printf("time during:%d",tickslastlast-tickslast);
 ////			tickslast = HAL_GetTick();
-		/*ÔÙ´ÎÆô¶¯£¬ADC£¬´ÓµÚÒ»ÁÐ¿ªÊ¼´¥·¢DMA°áÔË²ÉÑùÊý¾Ý*/
-			setCD4076Channel(0);
+		/*ï¿½Ù´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ADCï¿½ï¿½ï¿½Óµï¿½Ò»ï¿½Ð¿ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½DMAï¿½ï¿½ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+			// setCD4076Channel(0);
 			//HAL_Delay(1);
 			delay_us(500);
 		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue,16);

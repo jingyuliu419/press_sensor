@@ -45,6 +45,7 @@ void MX_ADC1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 	uint16_t ADC_Read(uint32_t Channel);
+void hexdump(const void *ptr, size_t len, uintptr_t disp_addr);
 
 /* USER CODE END Prototypes */
 

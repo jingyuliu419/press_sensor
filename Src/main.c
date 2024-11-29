@@ -125,13 +125,15 @@ uint16_t adcValue2[16];
 uint16_t adcValue3[16];
 uint16_t adcValue4[16];
 uint16_t adcValue5[16];
-//while(1)
-//{}
+// while(1)
+// {}
 //setCD4076Channel(15);
 while(1)
 {
+			printf("*************************************************\r\n");
 			for(int i=0;i<16;++i)//??
 			{
+				setCD4076Channel(i);
 				adcValue2[15-1]=ADC_Read(ADC_CHANNEL_0);
 				adcValue2[13-1]=ADC_Read(ADC_CHANNEL_1);
 				adcValue2[11-1]=ADC_Read(ADC_CHANNEL_2);
@@ -148,30 +150,34 @@ while(1)
 				adcValue2[12-1]=ADC_Read(ADC_CHANNEL_13);
 				adcValue2[14-1]=ADC_Read(ADC_CHANNEL_14);
 				adcValue2[16-1]=ADC_Read(ADC_CHANNEL_15);
+	
+				uint16_t temp;
+				for(int j=0;j<8;j++)
+				{
+					temp=adcValue2[j];
+					adcValue2[j]=adcValue2[15-j];
+					adcValue2[15-j]=temp;
+				}
+
+				printf("[%2d]", i);
+				for(int i=0;i<16;++i)//??
+				{
+					printf("%5d ",adcValue2[i]);
+				}
+				printf("\r\n");
 			}
 			//????
-			uint16_t temp;
-			for(int i=0;i<8;i++)
-			{
-				temp=adcValue2[i];
-				adcValue2[i]=adcValue2[15-i];
-				adcValue2[15-i]=temp;
-			}
-			for(int i=0;i<16;++i)//??
-			{
-				printf("%d ",adcValue2[i]);
-			}
-			printf("\n");
-			HAL_Delay(500);
+
+			HAL_Delay(1000);
 }
 	while(0)
 	{
-		setCD4076Channel(0);
+		// setCD4076Channel(0);
 		HAL_Delay(2);
 		//HAL_Delay(10);
 		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue,16);
 		HAL_Delay(2);
-		setCD4076Channel(1);
+		// setCD4076Channel(1);
 		HAL_Delay(2);
 		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue2,16);
 		HAL_Delay(2);
@@ -222,7 +228,7 @@ while(1)
     /* USER CODE BEGIN 3 */
 		for(int j=0;j<16;++j) //??
 		{
-			setCD4076Channel(j);
+			// setCD4076Channel(j);
 			for(int i=0;i<16;++i)//??
 			{
 				scanValue[j][15-1]=ADC_Read(ADC_CHANNEL_0);
