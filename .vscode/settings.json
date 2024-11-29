@@ -1,0 +1,6 @@
+{
+    "KeilAssistant.Project.ExcludeList": [
+        "template.uvproj",
+        "template.uvprojx"
+    ]
+}
