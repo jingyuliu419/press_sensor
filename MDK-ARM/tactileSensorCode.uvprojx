@@ -191,7 +191,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>0</useUlib>
+            <useUlib>1</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc; ../Drivers/STM32F1xx_HAL_Driver/Inc; ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy; ../Drivers/CMSIS/Device/ST/STM32F1xx/Include; ../Drivers/CMSIS/Include; ..\MDK-ARM</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;..\MDK-ARM;..\Drivers\BSP\ATK_MW8266D;..\Drivers\BSP\protocol</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -840,6 +840,26 @@
               <FileName>system_stm32f1xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/system_stm32f1xx.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Drivers/BSP</GroupName>
+          <Files>
+            <File>
+              <FileName>atk_mw8266d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP\ATK_MW8266D\atk_mw8266d.c</FilePath>
+            </File>
+            <File>
+              <FileName>atk_mw8266d_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP\ATK_MW8266D\atk_mw8266d_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>packet_transmission.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP\protocol\packet_transmission.c</FilePath>
             </File>
           </Files>
         </Group>

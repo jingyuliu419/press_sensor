@@ -40,3 +40,7 @@ tactilesensorcode\main.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdio.h
 tactilesensorcode\main.o: E:\Keil\ARM\ARMCC\Bin\..\include\string.h
 tactilesensorcode\main.o: ..\MDK-ARM\wifi.h
 tactilesensorcode\main.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdarg.h
+tactilesensorcode\main.o: ..\Drivers\BSP\ATK_MW8266D\atk_mw8266d.h
+tactilesensorcode\main.o: ..\Drivers\BSP\ATK_MW8266D\atk_mw8266d_uart.h
+tactilesensorcode\main.o: ..\Drivers\BSP\protocol\packet_transmission.h
+tactilesensorcode\main.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdlib.h

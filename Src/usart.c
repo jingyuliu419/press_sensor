@@ -19,14 +19,15 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usart.h"
+#include "atk_mw8266d.h"
 
 /* USER CODE BEGIN 0 */
 #include <stdio.h>
 #include "tim.h"
-//¼ÓÈëÒÔÏÂ´úÂë,Ö§³Öprintfº¯Êý,¶ø²»ÐèÒªÑ¡Ôñuse MicroLIB	  
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â´ï¿½ï¿½ï¿½,Ö§ï¿½ï¿½printfï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÒªÑ¡ï¿½ï¿½use MicroLIB	  
 #if 1
 #pragma import(__use_no_semihosting)             
-//±ê×¼¿âÐèÒªµÄÖ§³Öº¯Êý                 
+//ï¿½ï¿½×¼ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ö§ï¿½Öºï¿½ï¿½ï¿½                 
 struct __FILE 
 { 
 	int handle; 
@@ -34,15 +35,15 @@ struct __FILE
 }; 
 
 FILE __stdout;       
-//¶¨Òå_sys_exit()ÒÔ±ÜÃâÊ¹ÓÃ°ëÖ÷»úÄ£Ê½    
+//ï¿½ï¿½ï¿½ï¿½_sys_exit()ï¿½Ô±ï¿½ï¿½ï¿½Ê¹ï¿½Ã°ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½    
 void _sys_exit(int x) 
 { 
 	x = x; 
 } 
-//ÖØ¶¨Òåfputcº¯Êý 
+//ï¿½Ø¶ï¿½ï¿½ï¿½fputcï¿½ï¿½ï¿½ï¿½ 
 int fputc(int ch, FILE *f)
 {      
-	while((USART1->SR&0X40)==0);//Ñ­»··¢ËÍ,Ö±µ½·¢ËÍÍê±Ï   
+	while((USART1->SR&0X40)==0);//Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½   
     USART1->DR = (unsigned char) ch;      
 	return ch;
 }
@@ -89,98 +90,92 @@ void MX_USART1_UART_Init(void)
 }
 /* USART3 init function */
 
-void MX_USART3_UART_Init(void)
-{
+// void MX_USART3_UART_Init(void)
+// {
 
-  /* USER CODE BEGIN USART3_Init 0 */
+//   /* USER CODE BEGIN USART3_Init 0 */
 
-  /* USER CODE END USART3_Init 0 */
+//   /* USER CODE END USART3_Init 0 */
 
-  /* USER CODE BEGIN USART3_Init 1 */
+//   /* USER CODE BEGIN USART3_Init 1 */
 
-  /* USER CODE END USART3_Init 1 */
-  huart3.Instance = USART3;
-  huart3.Init.BaudRate = 460800;
-  huart3.Init.WordLength = UART_WORDLENGTH_8B;
-  huart3.Init.StopBits = UART_STOPBITS_1;
-  huart3.Init.Parity = UART_PARITY_NONE;
-  huart3.Init.Mode = UART_MODE_TX_RX;
-  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART3_Init 2 */
+//   /* USER CODE END USART3_Init 1 */
+//   huart3.Instance = USART3;
+//   huart3.Init.BaudRate = 460800;
+//   huart3.Init.WordLength = UART_WORDLENGTH_8B;
+//   huart3.Init.StopBits = UART_STOPBITS_1;
+//   huart3.Init.Parity = UART_PARITY_NONE;
+//   huart3.Init.Mode = UART_MODE_TX_RX;
+//   huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+//   huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+//   if (HAL_UART_Init(&huart3) != HAL_OK)
+//   {
+//     Error_Handler();
+//   }
+//   /* USER CODE BEGIN USART3_Init 2 */
 
-  /* USER CODE END USART3_Init 2 */
+//   /* USER CODE END USART3_Init 2 */
 
-}
+// }
 
 void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 {
 
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(uartHandle->Instance==USART1)
-  {
-  /* USER CODE BEGIN USART1_MspInit 0 */
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    if(uartHandle->Instance==USART1)
+    {
+    /* USER CODE BEGIN USART1_MspInit 0 */
 
-  /* USER CODE END USART1_MspInit 0 */
-    /* USART1 clock enable */
-    __HAL_RCC_USART1_CLK_ENABLE();
+    /* USER CODE END USART1_MspInit 0 */
+      /* USART1 clock enable */
+      __HAL_RCC_USART1_CLK_ENABLE();
 
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    /**USART1 GPIO Configuration
-    PA9     ------> USART1_TX
-    PA10     ------> USART1_RX
-    */
-    GPIO_InitStruct.Pin = GPIO_PIN_9;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+      __HAL_RCC_GPIOA_CLK_ENABLE();
+      /**USART1 GPIO Configuration
+      PA9     ------> USART1_TX
+      PA10     ------> USART1_RX
+      */
+      GPIO_InitStruct.Pin = GPIO_PIN_9;
+      GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+      GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+      HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_10;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+      GPIO_InitStruct.Pin = GPIO_PIN_10;
+      GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+      GPIO_InitStruct.Pull = GPIO_NOPULL;
+      HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    /* USART1 interrupt Init */
-    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(USART1_IRQn);
-  /* USER CODE BEGIN USART1_MspInit 1 */
+      /* USART1 interrupt Init */
+      HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+      HAL_NVIC_EnableIRQ(USART1_IRQn);
+    /* USER CODE BEGIN USART1_MspInit 1 */
 
-  /* USER CODE END USART1_MspInit 1 */
-  }
-  else if(uartHandle->Instance==USART3)
-  {
-  /* USER CODE BEGIN USART3_MspInit 0 */
-
-  /* USER CODE END USART3_MspInit 0 */
-    /* USART3 clock enable */
-    __HAL_RCC_USART3_CLK_ENABLE();
-
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-    /**USART3 GPIO Configuration
-    PB10     ------> USART3_TX
-    PB11     ------> USART3_RX
-    */
-    GPIO_InitStruct.Pin = GPIO_PIN_10;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_11;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    /* USART3 interrupt Init */
-    HAL_NVIC_SetPriority(USART3_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(USART3_IRQn);
-  /* USER CODE BEGIN USART3_MspInit 1 */
-
-  /* USER CODE END USART3_MspInit 1 */
-  }
+    /* USER CODE END USART1_MspInit 1 */
+    }
+    else if (uartHandle->Instance == ATK_MW8266D_UART_INTERFACE)                 /* ï¿½ï¿½ï¿½ï¿½ï¿½ATK-MW8266D UART */
+    {
+        ATK_MW8266D_UART_TX_GPIO_CLK_ENABLE();                              /* Ê¹ï¿½ï¿½UART TXï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ */
+        ATK_MW8266D_UART_RX_GPIO_CLK_ENABLE();                              /* Ê¹ï¿½ï¿½UART RXï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ */
+        ATK_MW8266D_UART_CLK_ENABLE();                                      /* Ê¹ï¿½ï¿½UARTÊ±ï¿½ï¿½ */
+        
+        GPIO_InitStruct.Pin    = ATK_MW8266D_UART_TX_GPIO_PIN;             /* UART TXï¿½ï¿½ï¿½ï¿½ */
+        GPIO_InitStruct.Mode   = GPIO_MODE_AF_PP;                          /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+        GPIO_InitStruct.Pull   = GPIO_NOPULL;                              /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+        GPIO_InitStruct.Speed  = GPIO_SPEED_FREQ_HIGH;                     /* ï¿½ï¿½ï¿½ï¿½ */
+        HAL_GPIO_Init(ATK_MW8266D_UART_TX_GPIO_PORT, &GPIO_InitStruct);    /* ï¿½ï¿½Ê¼ï¿½ï¿½UART TXï¿½ï¿½ï¿½ï¿½ */
+        
+        GPIO_InitStruct.Pin    = ATK_MW8266D_UART_RX_GPIO_PIN;             /* UART RXï¿½ï¿½ï¿½ï¿½ */
+        GPIO_InitStruct.Mode   = GPIO_MODE_INPUT;                          /* ï¿½ï¿½ï¿½ï¿½ */
+        GPIO_InitStruct.Pull   = GPIO_NOPULL;                              /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+        GPIO_InitStruct.Speed  = GPIO_SPEED_FREQ_HIGH;                     /* ï¿½ï¿½ï¿½ï¿½ */
+        HAL_GPIO_Init(ATK_MW8266D_UART_RX_GPIO_PORT, &GPIO_InitStruct);    /* ï¿½ï¿½Ê¼ï¿½ï¿½UART RXï¿½ï¿½ï¿½ï¿½ */
+        
+        HAL_NVIC_SetPriority(ATK_MW8266D_UART_IRQn, 0, 0);                  /* ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½È¼ï¿½0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½0 */
+        HAL_NVIC_EnableIRQ(ATK_MW8266D_UART_IRQn);                          /* Ê¹ï¿½ï¿½UARTï¿½Ð¶ï¿½Í¨ï¿½ï¿½ */
+        
+        __HAL_UART_ENABLE_IT(uartHandle, UART_IT_RXNE);                          /* Ê¹ï¿½ï¿½UARTï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ */
+        __HAL_UART_ENABLE_IT(uartHandle, UART_IT_IDLE);                          /* Ê¹ï¿½ï¿½UARTï¿½ï¿½ï¿½ß¿ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ */
+    }
 }
 
 void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
@@ -206,50 +201,50 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 
   /* USER CODE END USART1_MspDeInit 1 */
   }
-  else if(uartHandle->Instance==USART3)
-  {
-  /* USER CODE BEGIN USART3_MspDeInit 0 */
+  // else if(uartHandle->Instance==USART3)
+  // {
+  // /* USER CODE BEGIN USART3_MspDeInit 0 */
 
-  /* USER CODE END USART3_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_USART3_CLK_DISABLE();
+  // /* USER CODE END USART3_MspDeInit 0 */
+  //   /* Peripheral clock disable */
+  //   __HAL_RCC_USART3_CLK_DISABLE();
 
-    /**USART3 GPIO Configuration
-    PB10     ------> USART3_TX
-    PB11     ------> USART3_RX
-    */
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_10|GPIO_PIN_11);
+  //   /**USART3 GPIO Configuration
+  //   PB10     ------> USART3_TX
+  //   PB11     ------> USART3_RX
+  //   */
+  //   HAL_GPIO_DeInit(GPIOB, GPIO_PIN_10|GPIO_PIN_11);
 
-    /* USART3 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(USART3_IRQn);
-  /* USER CODE BEGIN USART3_MspDeInit 1 */
+  //   /* USART3 interrupt Deinit */
+  //   HAL_NVIC_DisableIRQ(USART3_IRQn);
+  // /* USER CODE BEGIN USART3_MspDeInit 1 */
 
-  /* USER CODE END USART3_MspDeInit 1 */
-  }
+  // /* USER CODE END USART3_MspDeInit 1 */
+  // }
 }
 
 /* USER CODE BEGIN 1 */
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-	printf("enter HAL_UART_RxCpltCallback\n");
-	if(huart->Instance == USART3)
-	{
-		printf("huart == huart3\n");
-		printf("uart3recvBuf %d\n",uart3recvBuf);
-		HAL_UART_Receive_IT(&huart3,&uart3recvBuf,1);
-		if(uart3recvBuf == '2')
-		 HAL_TIM_Base_Stop_IT(&htim2);
-		else if(uart3recvBuf == '1')
-		{
-			count=0;//count¼ÆÊýÇåÁã
-			HAL_TIM_Base_Start_IT(&htim2);
-		}
-	}
+// void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+// {
+// 	printf("enter HAL_UART_RxCpltCallback\n");
+// 	if(huart->Instance == USART3)
+// 	{
+// 		printf("huart == huart3\n");
+// 		printf("uart3recvBuf %d\n",uart3recvBuf);
+// 		HAL_UART_Receive_IT(&huart3,&uart3recvBuf,1);
+// 		if(uart3recvBuf == '2')
+// 		 HAL_TIM_Base_Stop_IT(&htim2);
+// 		else if(uart3recvBuf == '1')
+// 		{
+// 			count=0;//countï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+// 			HAL_TIM_Base_Start_IT(&htim2);
+// 		}
+// 	}
 	
 	
 	
-}
+// }
 
 /* USER CODE END 1 */
 

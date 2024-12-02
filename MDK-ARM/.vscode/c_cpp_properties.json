@@ -9,6 +9,8 @@
                 "d:\\project\\press_sensor\\Drivers\\CMSIS\\Device\\ST\\STM32F1xx\\Include",
                 "d:\\project\\press_sensor\\Drivers\\CMSIS\\Include",
                 "d:\\project\\press_sensor\\MDK-ARM",
+                "d:\\project\\press_sensor\\Drivers\\BSP\\ATK_MW8266D",
+                "d:\\project\\press_sensor\\Drivers\\BSP\\protocol",
                 "E:\\Keil\\ARM\\ARMCC\\include",
                 "E:\\Keil\\ARM\\ARMCC\\include\\arm_linux",
                 "E:\\Keil\\ARM\\ARMCC\\include\\arm_linux_compat",

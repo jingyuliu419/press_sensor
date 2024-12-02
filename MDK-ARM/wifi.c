@@ -3,18 +3,15 @@
 const u8* ip="192.168.31.161";	
 const u8* portnum="8000";	
 
-//WIFI STAÄ£Ê½,ÉèÖÃÒªÈ¥Á¬½ÓµÄÂ·ÓÉÆ÷ÎÞÏß²ÎÊý,Çë¸ù¾ÝÄã×Ô¼ºµÄÂ·ÓÉÆ÷ÉèÖÃ,×ÔÐÐÐÞ¸Ä.
-const u8* wifista_ssid="wsn";			//Â·ÓÉÆ÷SSIDºÅ
-const u8* wifista_encryption="wpawpa2_aes";	//wpa/wpa2 aes¼ÓÃÜ·½Ê½
-const u8* wifista_password="wsn123456"; 	//Á¬½ÓÃÜÂë
+//WIFI STAÄ£Ê½,ï¿½ï¿½ï¿½ï¿½ÒªÈ¥ï¿½ï¿½ï¿½Óµï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß²ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸ï¿½.
+const u8* wifista_ssid="wsn";
+const u8* wifista_encryption="wpawpa2_aes";
+const u8* wifista_password="wsn123456";
 
-//´®¿Ú·¢ËÍ»º´æÇø 	
-__align(8) u8 USART3_TX_BUF[USART3_MAX_SEND_LEN]; 	//·¢ËÍ»º³å,×î´óUSART3_MAX_SEND_LEN×Ö½Ú  	  
-//´®¿Ú½ÓÊÕ»º´æÇø 	
-u8 USART3_RX_BUF[USART3_MAX_RECV_LEN]; 				//½ÓÊÕ»º³å,×î´óUSART3_MAX_RECV_LEN¸ö×Ö½Ú.
+__align(8) u8 USART3_TX_BUF[USART3_MAX_SEND_LEN]; 	  
+ 	
+u8 USART3_RX_BUF[USART3_MAX_RECV_LEN]; 				//ï¿½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½USART3_MAX_RECV_LENï¿½ï¿½ï¿½Ö½ï¿½.
 
-//´®¿Ú3,printf º¯Êý
-//È·±£Ò»´Î·¢ËÍÊý¾Ý²»³¬¹ýUSART3_MAX_SEND_LEN×Ö½Ú
 void u3_printf(char* fmt,...)  
 {  
 	u16 i,j; 
@@ -22,30 +19,26 @@ void u3_printf(char* fmt,...)
 	va_start(ap,fmt);
 	vsprintf((char*)USART3_TX_BUF,fmt,ap);
 	va_end(ap);
-	i=strlen((const char*)USART3_TX_BUF);		//´Ë´Î·¢ËÍÊý¾ÝµÄ³¤¶È
-	for(j=0;j<i;j++)							//Ñ­»··¢ËÍÊý¾Ý
+	i=strlen((const char*)USART3_TX_BUF);		//ï¿½Ë´Î·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÝµÄ³ï¿½ï¿½ï¿½
+	for(j=0;j<i;j++)							//Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	{
-		while((USART3->SR&0X40)==0);			//Ñ­»··¢ËÍ,Ö±µ½·¢ËÍÍê±Ï   
+		while((USART3->SR&0X40)==0);			//Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½   
 		USART3->DR=USART3_TX_BUF[j];  
 	} 
 }
 
-//½«ÊÕµ½µÄATÖ¸ÁîÓ¦´ðÊý¾Ý·µ»Ø¸øµçÄÔ´®¿Ú
-//mode:0,²»ÇåÁãUSART3_RX_STA;
-//     1,ÇåÁãUSART3_RX_STA;
-void atk_8266_at_response(u8 mode)
+int atk_8266_at_response_dump()
 {
-	
+	char *resp;
+	/* TODO: get u3 */
+
+	printf("resp:%s\r\n", resp);
 }
-//ÏòATK-ESP8266·¢ËÍÃüÁî
-//cmd:·¢ËÍµÄÃüÁî×Ö·û´®
-//ack:ÆÚ´ýµÄÓ¦´ð½á¹û,Èç¹ûÎª¿Õ,Ôò±íÊ¾²»ÐèÒªµÈ´ýÓ¦´ð
-//waittime:µÈ´ýÊ±¼ä(µ¥Î»:10ms)
-//·µ»ØÖµ:0,·¢ËÍ³É¹¦(µÃµ½ÁËÆÚ´ýµÄÓ¦´ð½á¹û)
-//       1,·¢ËÍÊ§°Ü
+
 u8 atk_8266_send_cmd(u8 *cmd,u8 *ack,u16 waittime)
 {
-	u3_printf("%s\r\n",cmd);	//·¢ËÍÃüÁî
+	u3_printf("%s\r\n",cmd);
+	printf("%s\r\n",cmd);
 	if(waittime)
 	{
 		while(--waittime)
@@ -53,6 +46,8 @@ u8 atk_8266_send_cmd(u8 *cmd,u8 *ack,u16 waittime)
 			HAL_Delay(10);
 		}
 	}
+
+	atk_8266_at_response_dump();
 	return 0;
 }
 
@@ -61,19 +56,18 @@ void init_wifi_STA()
 {
 	u8 *p=cmd;
 	HAL_Delay(10);
-	atk_8266_at_response(1);
-	atk_8266_send_cmd("AT+CWMODE=1","OK",20);		//ÉèÖÃWIFI STAÄ£Ê½
-	atk_8266_send_cmd("AT+RST","OK",500);		//DHCP·þÎñÆ÷¹Ø±Õ 3sµÄµÈ´ýÆô¶¯ÊÇ±ØÒªµÄ£¡£¡
-	atk_8266_send_cmd("AT+CWJAP=\"wsn\",\"wsn123456\"","WIFI GOT IP",800);//5sµÄµÈ´ýWIFIÊÇ±ØÒªµÄ£¡£¡
-	atk_8266_send_cmd("AT+CIPMUX=0","OK",20);  //µ¥Á´½ÓÄ£Ê½
-	atk_8266_send_cmd("AT+CIPSTART=\"TCP\",\"192.168.31.161\",8000","OK",20);
-	atk_8266_send_cmd("AT+CIPMODE=1","OK",20);//´«ÊäÄ£Ê½Îª£ºÍ¸´«	
-	atk_8266_send_cmd("AT+CIPSEND","OK",20);//¿ªÊ¼Í¸´«   
+	atk_8266_send_cmd("AT+CWMODE=1","OK",20);		//ï¿½ï¿½ï¿½ï¿½WIFI STAÄ£Ê½
+	atk_8266_send_cmd("AT+RST","OK",500);		//DHCPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø±ï¿½ 3sï¿½ÄµÈ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç±ï¿½Òªï¿½Ä£ï¿½ï¿½ï¿½
+	atk_8266_send_cmd("AT+CWJAP=\"wsn\",\"wsn123456\"","WIFI GOT IP",800);//5sï¿½ÄµÈ´ï¿½WIFIï¿½Ç±ï¿½Òªï¿½Ä£ï¿½ï¿½ï¿½
+	atk_8266_send_cmd("AT+CIPMUX=0","OK",20);  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½
+	atk_8266_send_cmd("AT+CIPSTART=\"TCP\",\"192.168.31.101\",8000","OK",20);
+	atk_8266_send_cmd("AT+CIPMODE=1","OK",20);//ï¿½ï¿½ï¿½ï¿½Ä£Ê½Îªï¿½ï¿½Í¸ï¿½ï¿½	
+	atk_8266_send_cmd("AT+CIPSEND","OK",20);//ï¿½ï¿½Ê¼Í¸ï¿½ï¿½   
 	
-	//Á¬½Ó³É¹¦Ð£ÑéÓëLEDÖ¸Ê¾
+	//ï¿½ï¿½ï¿½Ó³É¹ï¿½Ð£ï¿½ï¿½ï¿½ï¿½LEDÖ¸Ê¾
 	//TODO
 	printf("config ok\n");
-	//u3_printf("test client\n");
+	u3_printf("test client\n");
 	
 }
 

@@ -30,6 +30,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "wifi.h"
+#include "atk_mw8266d.h"
+#include "packet_transmission.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -39,6 +41,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define DEMO_WIFI_SSID          "wsn"
+#define DEMO_WIFI_PWD           "wsn123456"
+#define DEMO_TCP_SERVER_IP      "192.168.31.101"
+#define DEMO_TCP_SERVER_PORT    "8000"
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -64,7 +70,56 @@ void SystemClock_Config(void);
 uint16_t scanValue[16][16]={0};
 uint16_t test=1000;
 
+void atk_mw8266d_test(void)
+{
+    uint8_t ret;
+    char ip_buf[16];
 
+    ret = atk_mw8266d_init(115200);
+    if (ret != 0)
+    {
+        printf("ATK-MW8266D init failed!\r\n");
+        return;
+    }
+
+    printf("Joining to AP...\r\n");
+    ret  = atk_mw8266d_restore();                               /* �ָ��������� */
+    printf("func:%s line%d\r\n", __FUNCTION__, __LINE__);
+    ret += atk_mw8266d_at_test();                               /* AT���� */
+    printf("func:%s line%d\r\n", __FUNCTION__, __LINE__);
+    ret += atk_mw8266d_set_mode(1);                             /* Stationģʽ */
+    printf("func:%s line%d\r\n", __FUNCTION__, __LINE__);
+    ret += atk_mw8266d_sw_reset();                              /* ������λ */
+    printf("func:%s line%d\r\n", __FUNCTION__, __LINE__);
+    // ret += atk_mw8266d_ate_config(0);                           /* �رջ��Թ��� */
+    // printf("func:%s line%d\r\n", __FUNCTION__, __LINE__);
+    ret += atk_mw8266d_join_ap(DEMO_WIFI_SSID, DEMO_WIFI_PWD);  /* ����WIFI */
+    printf("func:%s line%d\r\n", __FUNCTION__, __LINE__);
+    // ret += atk_mw8266d_get_ip(ip_buf);                          /* ��ȡIP��ַ */
+    // if (ret != 0)
+    // {
+    //     printf("Error to join ap!\r\n");
+    // }
+    atk_mw8266d_send_at_cmd("AT+CIPMUX=0", "OK", 10000);
+    printf("func:%s line%d\r\n", __FUNCTION__, __LINE__);
+    /* ����TCP������ */
+    ret = atk_mw8266d_connect_tcp_server(DEMO_TCP_SERVER_IP, DEMO_TCP_SERVER_PORT);
+    printf("func:%s line%d\r\n", __FUNCTION__, __LINE__);
+    if (ret != 0)
+    {
+        printf("Error to connect tcp server!\r\n");
+    }
+    printf("func:%s line%d\r\n", __FUNCTION__, __LINE__);
+
+    atk_mw8266d_send_at_cmd("AT+CIPMODE=1", "OK", 10000);
+    atk_mw8266d_send_at_cmd("AT+CIPSEND", "OK", 10000);
+    atk_mw8266d_uart_rx_restart();
+    printf("func:%s line%d\r\n", __FUNCTION__, __LINE__);
+
+    atk_mw8266d_uart_printf("This ATK-MW8266D TCP Connect Test.\r\n");
+
+    printf("IP: %s\r\n", ip_buf);
+}
 
 /* USER CODE END 0 */
 
@@ -74,222 +129,31 @@ uint16_t test=1000;
   */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
-  SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-	
-	//??????SysTick_IRQn?????
+	HAL_Init();
+	SystemClock_Config();
 	HAL_NVIC_SetPriority(SysTick_IRQn,0,0);
 
-  /* USER CODE END SysInit */
+	MX_GPIO_Init();
+	MX_DMA_Init();
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_DMA_Init();
-  
-  MX_ADC1_Init();
-  MX_USART1_UART_Init();
-  MX_USART3_UART_Init();
-  MX_TIM2_Init();
-  
-  /* USER CODE BEGIN 2 */
-	
-//	init_wifi_STA(); //?????WIFI??�???? STA??
-  /* USER CODE END 2 */
+	MX_ADC1_Init();
+	MX_USART1_UART_Init();
+	MX_TIM2_Init();
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
+	printf("built -- %s %s:%\r\n", __DATE__, __TIME__);
+
 	HAL_ADCEx_Calibration_Start(&hadc1);
-	setCD4076Channel(0); //?????????????????
+	setCD4076Channel(0);
 	HAL_Delay(5);
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue,16);
 	HAL_GPIO_WritePin(GPIOB,LED1_Pin,0);
-	//HAL_TIM_Base_Start_IT(&htim2);
-	HAL_UART_Receive_IT(&huart3,&uart3recvBuf,1);
-	
-uint16_t adcValue2[16];
-uint16_t adcValue3[16];
-uint16_t adcValue4[16];
-uint16_t adcValue5[16];
-// while(1)
-// {}
-//setCD4076Channel(15);
-while(1)
-{
-			printf("*************************************************\r\n");
-			for(int i=0;i<16;++i)//??
-			{
-				setCD4076Channel(i);
-				adcValue2[15-1]=ADC_Read(ADC_CHANNEL_0);
-				adcValue2[13-1]=ADC_Read(ADC_CHANNEL_1);
-				adcValue2[11-1]=ADC_Read(ADC_CHANNEL_2);
-				adcValue2[9-1]=ADC_Read(ADC_CHANNEL_3);
-				adcValue2[7-1]=ADC_Read(ADC_CHANNEL_4);
-				adcValue2[5-1]=ADC_Read(ADC_CHANNEL_5);
-				adcValue2[3-1]=ADC_Read(ADC_CHANNEL_6);
-				adcValue2[1-1]=ADC_Read(ADC_CHANNEL_7);
-				adcValue2[2-1]=ADC_Read(ADC_CHANNEL_8);
-				adcValue2[4-1]=ADC_Read(ADC_CHANNEL_9);
-				adcValue2[6-1]=ADC_Read(ADC_CHANNEL_10);
-				adcValue2[8-1]=ADC_Read(ADC_CHANNEL_11);
-				adcValue2[10-1]=ADC_Read(ADC_CHANNEL_12);
-				adcValue2[12-1]=ADC_Read(ADC_CHANNEL_13);
-				adcValue2[14-1]=ADC_Read(ADC_CHANNEL_14);
-				adcValue2[16-1]=ADC_Read(ADC_CHANNEL_15);
-	
-				uint16_t temp;
-				for(int j=0;j<8;j++)
-				{
-					temp=adcValue2[j];
-					adcValue2[j]=adcValue2[15-j];
-					adcValue2[15-j]=temp;
-				}
+	// packet_test();
+	atk_mw8266d_test();
+	atk_mw8266d_uart_printf("This ATK-MW8266D TCP Connect Test.\r\n");
 
-				printf("[%2d]", i);
-				for(int i=0;i<16;++i)//??
-				{
-					printf("%5d ",adcValue2[i]);
-				}
-				printf("\r\n");
-			}
-			//????
+  HAL_TIM_Base_Start_IT(&htim2);
 
-			HAL_Delay(1000);
-}
-	while(0)
-	{
-		// setCD4076Channel(0);
-		HAL_Delay(2);
-		//HAL_Delay(10);
-		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue,16);
-		HAL_Delay(2);
-		// setCD4076Channel(1);
-		HAL_Delay(2);
-		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue2,16);
-		HAL_Delay(2);
-//		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue3,16);
-//		HAL_Delay(5);
-//		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue4,16);
-//		HAL_Delay(5);
-//		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue5,16);
-//		HAL_Delay(5);	
-		for(int i=0;i<16;++i)//??
-			{
-				printf("%d ",adcValue[i]);
-			}
-			printf("\n");
-		
-		//HAL_Delay(10);
-		
-
-			for(int i=0;i<16;++i)//??
-			{
-				printf("%d ",adcValue2[i]);
-			}
-			printf("\n");
-			for(int i=0;i<16;++i)//??
-			{
-				printf("%d ",adcValue3[i]);
-			}
-			printf("\n");
-			for(int i=0;i<16;++i)//??
-			{
-				printf("%d ",adcValue4[i]);
-			}
-			printf("\n");
-			for(int i=0;i<16;++i)//??
-			{
-				printf("%d ",adcValue5[i]);
-			}
-			printf("\n");
-			printf("\n");
-			HAL_Delay(500);
-		
-	}
-  while (0)
-  {
-		uint32_t tickstart = HAL_GetTick();
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-		for(int j=0;j<16;++j) //??
-		{
-			// setCD4076Channel(j);
-			for(int i=0;i<16;++i)//??
-			{
-				scanValue[j][15-1]=ADC_Read(ADC_CHANNEL_0);
-				scanValue[j][13-1]=ADC_Read(ADC_CHANNEL_1);
-				scanValue[j][11-1]=ADC_Read(ADC_CHANNEL_2);
-				scanValue[j][9-1]=ADC_Read(ADC_CHANNEL_3);
-				scanValue[j][7-1]=ADC_Read(ADC_CHANNEL_4);
-				scanValue[j][5-1]=ADC_Read(ADC_CHANNEL_5);
-				scanValue[j][3-1]=ADC_Read(ADC_CHANNEL_6);
-				scanValue[j][1-1]=ADC_Read(ADC_CHANNEL_7);
-				scanValue[j][2-1]=ADC_Read(ADC_CHANNEL_8);
-				scanValue[j][4-1]=ADC_Read(ADC_CHANNEL_9);
-				scanValue[j][6-1]=ADC_Read(ADC_CHANNEL_10);
-				scanValue[j][8-1]=ADC_Read(ADC_CHANNEL_11);
-				scanValue[j][10-1]=ADC_Read(ADC_CHANNEL_12);
-				scanValue[j][12-1]=ADC_Read(ADC_CHANNEL_13);
-				scanValue[j][14-1]=ADC_Read(ADC_CHANNEL_14);
-				scanValue[j][16-1]=ADC_Read(ADC_CHANNEL_15);
-			}
-			//????
-			uint16_t temp;
-			for(int i=0;i<8;i++)
-			{
-				temp=scanValue[j][i];
-				scanValue[j][i]=scanValue[j][15-i];
-				scanValue[j][15-i]=temp;
-			}
-		}
-		
-		//?????��??????????????��???��???????
-		unsigned char preparedData[512];
-		int order=0;
-		for(int j=0;j<16;j++)
-		{
-			for(int i=0;i<16;++i)//??
-			{
-				preparedData[2*order]=scanValue[j][i]>>8;
-				preparedData[2*order+1]=scanValue[j][i]&0xff;
-				order++;
-			}
-		}
-		
-
-		//???????????????????WIFI???????????
-		HAL_UART_Transmit(&huart3,preparedData,512,0xffff);
-		unsigned char end[3];
-		end[0]=0xff;end[1]=0xff;end[2]=0xff;
-		HAL_UART_Transmit(&huart3,end,3,0xffff);
-		
-		uint32_t tickend = HAL_GetTick();
-		printf("time consume: %d",tickend-tickstart);
-		
-		//HAL_GPIO_TogglePin(GPIOB,LED3_Pin|LED2_Pin|LED1_Pin);
-		HAL_GPIO_WritePin(GPIOB,LED3_Pin,0);
-		
-		HAL_Delay(100);
-				HAL_GPIO_WritePin(GPIOB,LED3_Pin,1);
-		HAL_Delay(100);
-		
-	}
-  /* USER CODE END 3 */
+	while(1){};
 }
 
 /**

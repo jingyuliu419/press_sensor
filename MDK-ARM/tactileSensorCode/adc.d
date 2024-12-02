@@ -33,5 +33,11 @@ tactilesensorcode\adc.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_e
 tactilesensorcode\adc.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 tactilesensorcode\adc.o: ..\MDK-ARM\sys.h
 tactilesensorcode\adc.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdio.h
+tactilesensorcode\adc.o: E:\Keil\ARM\ARMCC\Bin\..\include\ctype.h
 tactilesensorcode\adc.o: ../Inc/gpio.h
 tactilesensorcode\adc.o: ../Inc/usart.h
+tactilesensorcode\adc.o: ..\Drivers\BSP\ATK_MW8266D\atk_mw8266d.h
+tactilesensorcode\adc.o: ..\Drivers\BSP\ATK_MW8266D\atk_mw8266d_uart.h
+tactilesensorcode\adc.o: ..\Drivers\BSP\protocol\packet_transmission.h
+tactilesensorcode\adc.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdlib.h
+tactilesensorcode\adc.o: E:\Keil\ARM\ARMCC\Bin\..\include\string.h

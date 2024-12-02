@@ -26,7 +26,10 @@
 "tactilesensorcode\stm32f1xx_hal_tim_ex.o"
 "tactilesensorcode\stm32f1xx_hal_uart.o"
 "tactilesensorcode\system_stm32f1xx.o"
---strict --scatter "tactileSensorCode\tactileSensorCode.sct"
+"tactilesensorcode\atk_mw8266d.o"
+"tactilesensorcode\atk_mw8266d_uart.o"
+"tactilesensorcode\packet_transmission.o"
+--library_type=microlib --strict --scatter "tactileSensorCode\tactileSensorCode.sct"
 --libpath=E:\Keil\ARM\ARMCC\lib --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list "tactileSensorCode.map" -o tactileSensorCode\tactileSensorCode.axf

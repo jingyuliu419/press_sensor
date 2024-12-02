@@ -1,6 +1,10 @@
 {
     "files.associations": {
         "wifi.h": "c",
-        "adc.h": "c"
+        "adc.h": "c",
+        "packet_transmission.h": "c",
+        "new": "c",
+        "atk_mw8266d.h": "c",
+        "atk_mw8266d_uart.h": "c"
     }
 }

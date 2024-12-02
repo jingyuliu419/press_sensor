@@ -22,9 +22,12 @@
 
 /* USER CODE BEGIN 0 */
 #include <stdio.h>
+#include <ctype.h>
 #include "gpio.h"
-	#include "usart.h"
-	#include "stdint.h"
+#include "usart.h"
+#include "stdint.h"
+#include "atk_mw8266d.h"
+#include "packet_transmission.h"
 
 #ifndef MIN
 #define MIN(a, b) ((b)>(a)?(a):(b))
@@ -33,7 +36,6 @@
 uint16_t all_point_value[256]={0};
 uint16_t ADC_scan_finished=FALSE;
 uint16_t adcValue[16]={0};
-uint16_t count=0;//�������м���
 
 /* USER CODE END 0 */
 
@@ -374,128 +376,81 @@ void delay_us(uint32_t us)
 	}
 }
 
-
-
-/**256��ͨ��������ɺ�����д������all_point_value�У���ADC_scan_finished��Ϊ1
-*/
 uint16_t afterorder[16];
 uint16_t t1;
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
+    static int round = 0;
 
-	static int round=0;
-	if(round ==0)
-		t1= HAL_GetTick();
-		//������������������
-		// setCD4076Channel(round+1);
-		afterorder[15-1]=adcValue[0];
-		afterorder[13-1]=adcValue[1];
-		afterorder[11-1]=adcValue[2];
-		afterorder[9-1]=adcValue[3];
-		afterorder[7-1]=adcValue[4];
-		afterorder[5-1]=adcValue[5];
-		afterorder[3-1]=adcValue[6];
-		afterorder[1-1]=adcValue[7];
-		afterorder[2-1]=adcValue[8];
-		afterorder[4-1]=adcValue[9];
-		afterorder[6-1]=adcValue[10];
-		afterorder[8-1]=adcValue[11];
-		afterorder[10-1]=adcValue[12];
-		afterorder[12-1]=adcValue[13];
-		afterorder[14-1]=adcValue[14];
-		afterorder[16-1]=adcValue[15]; 
-//		
-//		//���򣬺ʹ��������ϵ���˳��һ��
-		uint16_t temp;
-		for(int i=0; i<8;++i)
-		{
-			temp = afterorder[i];
-			afterorder[i]= afterorder[15-i];
-			afterorder[15-i]=temp;
-		}
-		
+    setCD4076Channel(round+1);
+    afterorder[15-1]=adcValue[0];
+    afterorder[13-1]=adcValue[1];
+    afterorder[11-1]=adcValue[2];
+    afterorder[9-1]=adcValue[3];
+    afterorder[7-1]=adcValue[4];
+    afterorder[5-1]=adcValue[5];
+    afterorder[3-1]=adcValue[6];
+    afterorder[1-1]=adcValue[7];
+    afterorder[2-1]=adcValue[8];
+    afterorder[4-1]=adcValue[9];
+    afterorder[6-1]=adcValue[10];
+    afterorder[8-1]=adcValue[11];
+    afterorder[10-1]=adcValue[12];
+    afterorder[12-1]=adcValue[13];
+    afterorder[14-1]=adcValue[14];
+    afterorder[16-1]=adcValue[15]; 
 
-    // printf("sizeof(afterorder)%d\r\n", sizeof(afterorder));
-    // hexdump(afterorder, sizeof(afterorder), (uintptr_t)afterorder);
-		//�������ӵ�256������֡������
-		for(int i=0;i<16;i++)
-		{
-			all_point_value[round*16+i]=afterorder[i];
-		}
-		round++;
-		if(round == 16)
-		{
-					//���ݲ�������ϣ����Է����ˡ�
-		uint16_t tic= HAL_GetTick();
-		// printf("adopt 16 times,tick:%d\n",tic-t1);
-			ADC_scan_finished =1;
-			round = 0;
-			return;
-		}
-		else
-		{
-			
-		//HAL_Delay(1);
-			delay_us(500);
-			HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue,16);//��һ��ɨ��ѭ���У�������һ��ѭ���������Ͳ��ٵ���
-		}
+    uint16_t temp;
+    for(int i=0; i<8;++i)
+    {
+        temp = afterorder[i];
+        afterorder[i]= afterorder[15-i];
+        afterorder[15-i]=temp;
+    }
+
+    for(int i=0;i<16;i++)
+    {
+        all_point_value[round*16+i]=afterorder[i];
+    }
+
+    round++;
+    if(round == 16)
+    {
+        ADC_scan_finished =1;
+        round = 0;
+        return;
+    }
+    else
+    {
+        delay_us(500);
+        HAL_ADC_Start_DMA(&hadc1, (uint32_t *)&adcValue, 16);
+    }
 }
 
 unsigned char preparedData[512];
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+    int ret;
+    uint8_t buffer[sizeof(Packet)];
 
-	count++;
 	HAL_GPIO_TogglePin(GPIOB,LED2_Pin);
 
 	if(ADC_scan_finished == 1)
 	{
-		uint16_t t1= HAL_GetTick();
-		//printf("enter in time callback,tick:%d\n",t1);
-		ADC_scan_finished=0;
+    ADC_scan_finished = 0;
 
-			for(int i=0;i<256;++i)//��
-			{
-				preparedData[2*i]=all_point_value[i]>>8;
-				preparedData[2*i+1]=all_point_value[i]&0xff;
-			}
-//			for(int i=0;i<256;++i)//��
-//			{
-//				printf("%d ",all_point_value[i]);
-//				if((i+1)%16 == 0)
-//					printf("\n");
-//			}
-//			printf("\n");
-			HAL_UART_Transmit(&huart3,preparedData,512,0xffff);
-			
-			
-			unsigned char stamp[2];
-			stamp[0]=count>>8;
-			stamp[1]=count&0xff;
-			HAL_UART_Transmit(&huart3,stamp,2,0xffff);
-//			printf("%d\n",count);
-			
-			
-			unsigned char end[3];
-			end[0]=0xfd;end[1]=0xfe;end[2]=0xff;
-			HAL_UART_Transmit(&huart3,end,3,0xffff);
-			
-			
-			
-			
-			//HAL_UART_Transmit(&huart1,preparedData,512,0xffff);
-			//HAL_UART_Transmit(&huart1,end,3,0xffff);
-//				tickslastlast=	HAL_GetTick();
-//			printf("time during:%d",tickslastlast-tickslast);
-////			tickslast = HAL_GetTick();
-		/*�ٴ�������ADC���ӵ�һ�п�ʼ����DMA���˲�������*/
-			// setCD4076Channel(0);
-			//HAL_Delay(1);
-			delay_us(500);
-		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&adcValue,16);
-		uint16_t t2= HAL_GetTick();
-		//printf("out time callback,tick consume :%d\n",t2-t1);
-	}
+        // 封包
+        ret = pack_packet(buffer, (uint8_t *)all_point_value, sizeof(all_point_value));
+        if (ret) {
+            printf("Packet packed successfully.\r\n");
+        }
+
+        for (int i = 0; i < sizeof(buffer); i++) {
+            atk_mw8266d_uart_putchar(buffer[i]);
+        }
+
+        HAL_ADC_Start_DMA(&hadc1, (uint32_t *)&adcValue, 16);
+    }
 }
 
 
